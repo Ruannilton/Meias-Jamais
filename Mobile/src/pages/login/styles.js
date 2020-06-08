@@ -42,6 +42,12 @@ export const style = StyleSheet.create({
         color: 'white',
         marginLeft: 5,
     },
+
+    errorMessage: {
+        marginTop: 5,
+        marginLeft: 30,
+        alignSelf: 'flex-start',
+    },
     //#endregion
 
     //#region logInStyles
@@ -63,20 +69,20 @@ export const style = StyleSheet.create({
     },
     //#endregion
 
-    //#region signIn
-    signInContainer: {
+    //#region signUp
+    signUpContainer: {
         marginTop: 90,
 
         flexDirection: 'row',
         justifyContent: 'center',
     },
 
-    signInButtonText: {
+    signUpButtonText: {
         color: 'white',
         fontSize: 19,
     },
 
-    signInDescription: {
+    signUpDescription: {
         color: 'white',
         fontSize: 19,
         fontFamily: 'Roboto-Thin',

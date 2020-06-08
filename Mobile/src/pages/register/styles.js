@@ -34,7 +34,7 @@ export const style = StyleSheet.create({
     },
 
     imagePickerContainer: {
-        marginBottom: 20,
+        // marginBottom: 20,
         alignItems: 'center',
         justifyContent: 'center',
     },

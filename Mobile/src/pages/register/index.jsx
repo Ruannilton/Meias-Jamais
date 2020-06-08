@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { Fragment, useState, useEffect, useMemo } from 'react';
 import {
     View,
     Image,
@@ -10,6 +10,7 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
 } from 'react-native';
+import { useForm } from 'react-hook-form';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
     Feather,
@@ -21,6 +22,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import DateFunctions from '../../utils/DateFunctions';
 import ImagePicker from '../../utils/ImagePicker';
 
+import RequiredMessage from '../../components/ErrorsMessages/RequiredMessage';
 import AvatarImage from '../../assets/register/avatarImage.png';
 import AvatarFrame from '../../assets/register/avatarFrame.png';
 
@@ -32,7 +34,26 @@ const Register = () => {
     const [isFirstPartCompleted, setIsFirstPartCompleted] = useState(false);
     // user data
     const [image, setImage] = useState(null);
+    const [name, setName] = useState('');
+    const [user, setUser] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [birthday, setBirthday] = useState(null);
+
+    const { register, handleSubmit, setValue, errors } = useForm({
+        // mode: 'onBlur',
+        // reValidateMode: 'onChange',
+    });
+
+    useEffect(() => {
+        register({ name: 'image' }, { required: true });
+        register({ name: 'name' }, { required: true });
+        register({ name: 'user' }, { required: true });
+        register({ name: 'email' }, { required: true });
+        register({ name: 'birthday' }, { required: true });
+        register({ name: 'password' }, { required: true });
+        register({ name: 'confirmPassword' }, { required: true });
+    }, [register]);
 
     // useEffect(() => {
     //     function showBirthday() {
@@ -41,9 +62,29 @@ const Register = () => {
     //     showBirthday();
     // }, [birthday]);
 
+    const handleName = (data) => {
+        setValue('name', text);
+        setName(data);
+    };
+
+    const handleImage = (image) => {
+        setImage(image);
+        setValue('image', image);
+    };
+
     const setDate = (event, date) => {
         setDatePickerIsOpen(false);
         setBirthday(date);
+        setValue('birthday', date);
+    };
+
+    const handleFirstSubmit = (data) => {
+        console.log('oi');
+        setIsFirstPartCompleted(true);
+    };
+
+    const handleSignUp = (data) => {
+        console.log('oi');
     };
 
     return (
@@ -66,7 +107,7 @@ const Register = () => {
                                         style={{
                                             alignItems: 'center',
                                         }}
-                                        setImage={setImage}
+                                        setImage={handleImage}
                                     >
                                         <Image
                                             source={
@@ -84,6 +125,15 @@ const Register = () => {
                                         )}
                                     </ImagePicker>
                                 </View>
+                                {errors.image && (
+                                    <RequiredMessage
+                                        secondary
+                                        style={{
+                                            marginBottom: 10,
+                                            alignSelf: 'center',
+                                        }}
+                                    />
+                                )}
                                 <View style={style.inputsContainerPartOne}>
                                     <View style={{ flexDirection: 'row' }}>
                                         <Feather
@@ -94,8 +144,14 @@ const Register = () => {
                                         <TextInput
                                             style={style.inputText}
                                             placeholder="Nome"
+                                            onChangeText={(text) =>
+                                                setName(text)
+                                            }
                                         />
                                     </View>
+                                    {errors.name && (
+                                        <RequiredMessage secondary />
+                                    )}
                                     <View style={{ flexDirection: 'row' }}>
                                         <Feather
                                             name="at-sign"
@@ -105,8 +161,14 @@ const Register = () => {
                                         <TextInput
                                             style={style.inputText}
                                             placeholder="Nome de Usuário"
+                                            onChangeText={(text) =>
+                                                setValue('user', text)
+                                            }
                                         />
                                     </View>
+                                    {errors.user && (
+                                        <RequiredMessage secondary />
+                                    )}
                                     <View
                                         style={{
                                             marginLeft: 2,
@@ -121,8 +183,14 @@ const Register = () => {
                                         <TextInput
                                             style={style.inputText}
                                             placeholder="Email"
+                                            onChangeText={(text) =>
+                                                setValue('email', text)
+                                            }
                                         />
                                     </View>
+                                    {errors.email && (
+                                        <RequiredMessage secondary />
+                                    )}
                                     <View>
                                         <TouchableOpacity
                                             onPress={() =>
@@ -169,11 +237,14 @@ const Register = () => {
                                             )}
                                         </TouchableOpacity>
                                     </View>
+                                    {errors.birthday && (
+                                        <RequiredMessage secondary />
+                                    )}
                                 </View>
                             </View>
                             <TouchableOpacity
                                 style={style.goForwardButton}
-                                onPress={() => setIsFirstPartCompleted(true)}
+                                onPress={handleSubmit(handleFirstSubmit)}
                             >
                                 <Text style={style.goForwardButtonText}>
                                     Avançar
@@ -194,7 +265,20 @@ const Register = () => {
                                             secureTextEntry
                                             style={style.inputText}
                                             placeholder="Senha"
+                                            onChangeText={(text) =>
+                                                setValue('password', text)
+                                            }
                                         />
+                                        {errors.password && (
+                                            <RequiredMessage
+                                                style={
+                                                    {
+                                                        // alignSelf: 'flex-start',
+                                                        // marginLeft: 30,
+                                                    }
+                                                }
+                                            />
+                                        )}
                                     </View>
                                     <View style={{ flexDirection: 'row' }}>
                                         <MaterialIcons
@@ -206,6 +290,12 @@ const Register = () => {
                                             secureTextEntry
                                             style={style.inputText}
                                             placeholder="Confirme sua senha"
+                                            onChangeText={(text) =>
+                                                setValue(
+                                                    'confirmPassword',
+                                                    text
+                                                )
+                                            }
                                         />
                                     </View>
                                 </View>
@@ -221,9 +311,7 @@ const Register = () => {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={style.goBackButton}
-                                    onPress={() =>
-                                        setIsFirstPartCompleted(false)
-                                    }
+                                    onPress={() => handleSignUp()}
                                 >
                                     <Text style={style.createAccountButtonText}>
                                         Criar Conta

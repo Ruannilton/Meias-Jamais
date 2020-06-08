@@ -12,7 +12,7 @@ const Routes = () => {
     //modificar para esperar na SplashScreen
     //react-native-splash-screen
 
-    if (!RobotoFamily() && !loading) {
+    if (!loading) {
         return (
             <View
                 style={{
