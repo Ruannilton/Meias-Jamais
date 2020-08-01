@@ -27,7 +27,7 @@ module.exports = {
                     usr.senha
                 );
                 let token = jwt.sign({ id: usr.id }, "teste", {
-                    expiresIn: "12h"
+                    expiresIn: "12h",
                 });
                 response.json({ token });
             })
@@ -55,7 +55,7 @@ module.exports = {
             .where("id", id)
             .update({
                 nome,
-                descricao
+                descricao,
             })
             .then(res => {
                 response.json(res);
@@ -74,24 +74,66 @@ module.exports = {
             descricao,
             dt_aniversario,
             image_link,
-            senha
+            senha,
         } = request.body;
 
         connection("usuario")
-            .insert({
-                nome,
-                nome_usuario,
-                descricao,
-                dt_criacao: Date.now().toString(),
-                dt_aniversario: new Date(dt_aniversario),
-                figura_publica,
-                image_link,
-                email,
-                senha
-            })
+            .where({ nome_usuario })
+            .count()
             .then(res => {
-                const [id] = res;
-                return response.json({ id });
+                console.log("nome_usuario: ", res[0]["count(*)"]);
+
+                if (res[0]["count(*)"] > 0) {
+                    response.json({
+                        msg: "username already exist",
+                    });
+                    return;
+                } else {
+                    connection("usuario")
+                        .where({ email })
+                        .count()
+                        .then(res => {
+                            console.log("email: ", res[0]["count(*)"]);
+                            if (res[0]["count(*)"] > 0) {
+                                response.json({
+                                    msg: "email already exist",
+                                });
+                                return;
+                            } else {
+                                connection("usuario")
+                                    .insert({
+                                        nome,
+                                        nome_usuario,
+                                        descricao,
+                                        dt_criacao: Date.now().toString(),
+                                        dt_aniversario: new Date(
+                                            dt_aniversario
+                                        ),
+                                        figura_publica,
+                                        image_link,
+                                        email,
+                                        senha,
+                                    })
+                                    .then(res => {
+                                        const [id] = res;
+                                        return response.json({ id });
+                                    })
+                                    .catch(error => {
+                                        response
+                                            .status(404)
+                                            .json({
+                                                err: error,
+                                                msg: error.toString(),
+                                            });
+                                    });
+                            }
+                        })
+                        .catch(error => {
+                            response
+                                .status(404)
+                                .json({ err: error, msg: error.toString() });
+                        });
+                }
             })
             .catch(error => {
                 response
@@ -119,7 +161,7 @@ module.exports = {
             .insert({
                 usuario_id: my_id,
                 usuario_seguido_id: followed_id,
-                pendente
+                pendente,
             })
             .then(res => {
                 const [my_id] = res;
@@ -170,5 +212,5 @@ module.exports = {
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
             });
-    }
+    },
 };
