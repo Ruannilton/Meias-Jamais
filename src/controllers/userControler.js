@@ -78,20 +78,62 @@ module.exports = {
         } = request.body;
 
         connection("usuario")
-            .insert({
-                nome,
-                nome_usuario,
-                descricao,
-                dt_criacao: Date.now().toString(),
-                dt_aniversario: new Date(dt_aniversario),
-                figura_publica,
-                image_link,
-                email,
-                senha,
-            })
+            .where({ nome_usuario })
+            .count()
             .then(res => {
-                const [id] = res;
-                return response.json({ id });
+                console.log("nome_usuario: ", res[0]["count(*)"]);
+
+                if (res[0]["count(*)"] > 0) {
+                    response.json({
+                        msg: "username already exist",
+                    });
+                    return;
+                } else {
+                    connection("usuario")
+                        .where({ email })
+                        .count()
+                        .then(res => {
+                            console.log("email: ", res[0]["count(*)"]);
+                            if (res[0]["count(*)"] > 0) {
+                                response.json({
+                                    msg: "email already exist",
+                                });
+                                return;
+                            } else {
+                                connection("usuario")
+                                    .insert({
+                                        nome,
+                                        nome_usuario,
+                                        descricao,
+                                        dt_criacao: Date.now().toString(),
+                                        dt_aniversario: new Date(
+                                            dt_aniversario
+                                        ),
+                                        figura_publica,
+                                        image_link,
+                                        email,
+                                        senha,
+                                    })
+                                    .then(res => {
+                                        const [id] = res;
+                                        return response.json({ id });
+                                    })
+                                    .catch(error => {
+                                        response
+                                            .status(404)
+                                            .json({
+                                                err: error,
+                                                msg: error.toString(),
+                                            });
+                                    });
+                            }
+                        })
+                        .catch(error => {
+                            response
+                                .status(404)
+                                .json({ err: error, msg: error.toString() });
+                        });
+                }
             })
             .catch(error => {
                 response
