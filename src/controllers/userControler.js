@@ -1,5 +1,6 @@
 const connection = require("./../database/connetcion");
 const jwt = require("jsonwebtoken");
+const { request } = require("express");
 
 module.exports = {
     index(request, response) {
@@ -32,12 +33,26 @@ module.exports = {
                     let token = jwt.sign({ id: usr.id }, "teste", {
                         expiresIn: "12h",
                     });
-                    response.json({ token });
+                    response.json({ token, user: { login, password } });
                 }
             })
             .catch(error => {
                 console.log("deu ruim");
                 response.json({ err: error, msg: error.toString() });
+            });
+    },
+
+    getUser(resquest, response) {
+        const id = req.id;
+        connection("usuario")
+            .where("id", id)
+            .then(res => {
+                response.json(res);
+            })
+            .catch(error => {
+                response
+                    .status(404)
+                    .json({ err: error, msg: error.toString() });
             });
     },
 

@@ -19,6 +19,9 @@ routes.post("/user/login", userControler.login);
 // retorna todos os usuarios
 routes.get("/user/index", tokenVerifier, userControler.index);
 
+// retonar o usuario logado
+routes.get("/user/getCurrentUser", tokenVerifier, userControler.getUser);
+
 // retorna um usuário específico
 routes.get("/user/:id", tokenVerifier, userControler.get);
 
