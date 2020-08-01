@@ -15,6 +15,7 @@ module.exports = {
 
     login(request, response) {
         const { password, login } = request.body;
+        console.log("Try logging: ", login, password);
         connection("usuario")
             .where({ nome_usuario: login, senha: password })
             .orWhere({ email: login, senha: password })
@@ -119,12 +120,10 @@ module.exports = {
                                         return response.json({ id });
                                     })
                                     .catch(error => {
-                                        response
-                                            .status(404)
-                                            .json({
-                                                err: error,
-                                                msg: error.toString(),
-                                            });
+                                        response.status(404).json({
+                                            err: error,
+                                            msg: error.toString(),
+                                        });
                                     });
                             }
                         })
