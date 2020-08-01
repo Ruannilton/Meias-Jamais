@@ -21,7 +21,10 @@ module.exports = {
             .orWhere({ email: login, senha: password })
             .then(res => {
                 const usr = res[0];
-                console.log("Res:", usr);
+                if (usr == undefined) {
+                    response.sendStatus(404).json({ msg: "user not found" });
+                    return;
+                }
                 console.log(
                     "[userControler][login]:",
                     usr.nome_usuario,
