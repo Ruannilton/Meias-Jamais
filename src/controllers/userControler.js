@@ -43,7 +43,8 @@ module.exports = {
     },
 
     getUser(resquest, response) {
-        const id = req.id;
+        const id = request.id;
+
         connection("usuario")
             .where("id", id)
             .then(res => {
