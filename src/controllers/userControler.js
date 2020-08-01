@@ -22,7 +22,7 @@ module.exports = {
             .then(res => {
                 const usr = res[0];
                 if (usr == undefined) {
-                    response.sendStatus(404).json({ msg: "user not found" });
+                    response.status(404).json({ msg: "user not found" });
                     return;
                 }
                 console.log(
