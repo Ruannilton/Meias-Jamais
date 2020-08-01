@@ -24,7 +24,8 @@ app.use(function (err, req, res, next) {
         next(err);
     }
 });
-var port = process.env.PORT || 3333
+var port = process.env.PORT || 3333;
 app.use(express.json());
 app.use(routes);
+console.log("Running on port:", port);
 app.listen(port);
