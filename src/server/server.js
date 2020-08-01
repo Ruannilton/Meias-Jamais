@@ -1,8 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-
-const server = express();
-
 const cors = require("cors");
 const routes = require("./router");
 
@@ -24,7 +21,8 @@ app.use(function (err, req, res, next) {
         next(err);
     }
 });
-var port = process.env.PORT || 3333
+var port = process.env.PORT || 3333;
 app.use(express.json());
 app.use(routes);
+console.log("Running on port:", port);
 app.listen(port);

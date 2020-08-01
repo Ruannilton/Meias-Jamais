@@ -27,7 +27,7 @@ module.exports = {
                     usr.senha
                 );
                 let token = jwt.sign({ id: usr.id }, "teste", {
-                    expiresIn: "12h"
+                    expiresIn: "12h",
                 });
                 response.json({ token });
             })
@@ -55,7 +55,7 @@ module.exports = {
             .where("id", id)
             .update({
                 nome,
-                descricao
+                descricao,
             })
             .then(res => {
                 response.json(res);
@@ -74,7 +74,7 @@ module.exports = {
             descricao,
             dt_aniversario,
             image_link,
-            senha
+            senha,
         } = request.body;
 
         connection("usuario")
@@ -87,7 +87,7 @@ module.exports = {
                 figura_publica,
                 image_link,
                 email,
-                senha
+                senha,
             })
             .then(res => {
                 const [id] = res;
@@ -119,7 +119,7 @@ module.exports = {
             .insert({
                 usuario_id: my_id,
                 usuario_seguido_id: followed_id,
-                pendente
+                pendente,
             })
             .then(res => {
                 const [my_id] = res;
@@ -170,5 +170,5 @@ module.exports = {
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
             });
-    }
+    },
 };
