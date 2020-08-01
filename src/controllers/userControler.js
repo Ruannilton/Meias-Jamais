@@ -23,17 +23,17 @@ module.exports = {
                 const usr = res[0];
                 if (usr == undefined) {
                     response.status(404).json({ msg: "user not found" });
-                    return;
+                } else {
+                    console.log(
+                        "[userControler][login]:",
+                        usr.nome_usuario,
+                        usr.senha
+                    );
+                    let token = jwt.sign({ id: usr.id }, "teste", {
+                        expiresIn: "12h",
+                    });
+                    response.json({ token });
                 }
-                console.log(
-                    "[userControler][login]:",
-                    usr.nome_usuario,
-                    usr.senha
-                );
-                let token = jwt.sign({ id: usr.id }, "teste", {
-                    expiresIn: "12h",
-                });
-                response.json({ token });
             })
             .catch(error => {
                 console.log("deu ruim");
