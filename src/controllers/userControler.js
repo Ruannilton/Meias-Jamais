@@ -21,7 +21,7 @@ module.exports = {
             .orWhere({ email: login, senha: password })
             .then(res => {
                 const usr = res[0];
-
+                console.log("Res:", usr);
                 console.log(
                     "[userControler][login]:",
                     usr.nome_usuario,
