@@ -42,7 +42,7 @@ module.exports = {
             });
     },
 
-    getUser(resquest, response) {
+    getUser(request, response) {
         const id = request.id;
 
         connection("usuario")
