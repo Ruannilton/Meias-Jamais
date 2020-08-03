@@ -20,7 +20,7 @@ module.exports = {
             produto_descricao,
             produto_image,
             produto_link,
-            recebido
+            recebido,
         } = request.body;
         connection("posts")
             .insert({
@@ -29,7 +29,7 @@ module.exports = {
                 produto_descricao,
                 produto_image,
                 produto_link,
-                recebido
+                recebido,
             })
             .then(res => {
                 const [id] = res;
@@ -59,7 +59,7 @@ module.exports = {
             produto_descricao,
             produto_image,
             produto_link,
-            recebido
+            recebido,
         } = request.body;
         connection("posts")
             .where("id", id)
@@ -69,7 +69,7 @@ module.exports = {
                 produto_descricao,
                 produto_image,
                 produto_link,
-                recebido
+                recebido,
             })
             .then(res => {
                 response.json(res);
@@ -77,5 +77,16 @@ module.exports = {
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
             });
-    }
+    },
+
+    index(request, response) {
+        connection("posts")
+            .select("*")
+            .then(res => {
+                response.json(res);
+            })
+            .catch(error => {
+                response.json({ err: error, msg: error.toString() });
+            });
+    },
 };

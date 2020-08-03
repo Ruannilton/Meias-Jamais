@@ -70,6 +70,8 @@ routes.post("/post/create", tokenVerifier, postControler.create);
 routes.delete("/post/remove/:id", tokenVerifier, postControler.remove);
 
 routes.put("/post/update", tokenVerifier, postControler.update);
+
+routes.get("/post/index", tokenVerifier, postControler.index);
 //#endregion
 
 //#region COMENTARIO
