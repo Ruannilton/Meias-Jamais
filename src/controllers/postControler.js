@@ -80,11 +80,11 @@ module.exports = {
     },
 
     index(request, response) {
+        console.log("post index");
+        console.log(res);
         connection("posts")
             .select("*")
             .then(res => {
-                console.log("post index");
-                console.log(res);
                 response.json(res);
             })
             .catch(error => {
