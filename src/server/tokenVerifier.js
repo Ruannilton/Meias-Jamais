@@ -1,8 +1,14 @@
 const jwt = require("jsonwebtoken");
 
 function tokenVerifier(req, res, next) {
-    var token = req.headers["authorization"].split(" ")[1];
-    console.log(token);
+    var str = req.headers["authorization"];
+
+    if (!str)
+        return res
+            .status(401)
+            .send({ auth: false, message: "No token provided." });
+
+    var token = str.split(" ")[1];
 
     if (!token)
         return res
@@ -10,11 +16,12 @@ function tokenVerifier(req, res, next) {
             .send({ auth: false, message: "No token provided." });
 
     jwt.verify(token, "teste", function (err, decoded) {
-        if (err)
+        if (err) {
             return res.status(500).send({
                 auth: false,
-                message: "Failed to authenticate token."
+                message: "Failed to authenticate token.",
             });
+        }
         req.id = decoded.id;
         next();
     });

@@ -211,7 +211,13 @@ module.exports = {
             .where("usuario_seguido_id", id)
             .select("usuario_id")
             .then(res => {
-                return response.json(res);
+                let r = [];
+                const c = res.length;
+
+                for (const i of res) {
+                    r.push(i["usuario_id"]);
+                }
+                return response.json({ total: c, values: r });
             })
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
@@ -225,7 +231,12 @@ module.exports = {
             .select("usuario_seguido_id")
             .as("usuario_id")
             .then(res => {
-                return response.json(res);
+                let r = [];
+                const c = res.length;
+                for (const i of res) {
+                    r.push(i["usuario_id"]);
+                }
+                return response.json({ total: c, values: r });
             })
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
