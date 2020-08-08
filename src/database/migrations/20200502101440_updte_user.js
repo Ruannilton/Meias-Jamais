@@ -36,6 +36,7 @@ exports.up = function (knex) {
                 .notNullable();
             table.string("produto_nome", 64).notNullable();
             table.string("produto_descricao", 256).notNullable();
+            table.string("categoria", 256).notNullable();
             table.string("produto_image", 256).notNullable();
             table.string("produto_link", 256);
             table.boolean("recebido").notNullable();
@@ -68,6 +69,19 @@ exports.up = function (knex) {
             table.string("mensagem", 256).notNullable();
         })
         .createTable("interesses", table => {
+            table.increments("id");
+            table
+                .integer("usuario_id")
+                .references("id")
+                .inTable("usuario")
+                .notNullable();
+            table
+                .integer("post_id")
+                .references("id")
+                .inTable("posts")
+                .notNullable();
+        })
+        .createTable("feed", table => {
             table.increments("id");
             table
                 .integer("usuario_id")

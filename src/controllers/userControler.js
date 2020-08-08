@@ -30,9 +30,7 @@ module.exports = {
                         usr.nome_usuario,
                         usr.senha
                     );
-                    let token = jwt.sign({ id: usr.id }, "teste", {
-                        expiresIn: "12h",
-                    });
+                    let token = jwt.sign({ id: usr.id }, "teste");
                     response.json({ token, user: { login, password } });
                 }
             })
@@ -174,16 +172,18 @@ module.exports = {
     },
 
     addFolower(request, response) {
-        const { my_id, followed_id, pendente } = request.body;
+        const { other_id } = request.params;
+        const id = request.id;
+
         connection("usuario_usuario")
             .insert({
-                usuario_id: my_id,
-                usuario_seguido_id: followed_id,
-                pendente,
+                usuario_id: id,
+                usuario_seguido_id: other_id,
+                pendente: true,
             })
             .then(res => {
-                const [my_id] = res;
-                return response.json({ my_id });
+                const [id] = res;
+                return response.json({ id });
             })
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
@@ -191,11 +191,12 @@ module.exports = {
     },
 
     remFolower(request, response) {
-        const { my_id, followed_id } = request.query;
+        const { other_id } = request.params;
+        const id = request.id;
 
         connection("usuario_usuario")
-            .where("usuario_id", my_id)
-            .where("usuario_seguido_id", followed_id)
+            .where("usuario_id", id)
+            .where("usuario_seguido_id", other_id)
             .del()
             .then(res => {
                 return response.json(res);
@@ -205,7 +206,7 @@ module.exports = {
             });
     },
 
-    getFollower(request, response) {
+    getFollowers(request, response) {
         const { id } = request.params;
         connection("usuario_usuario")
             .where("usuario_seguido_id", id)
@@ -240,6 +241,19 @@ module.exports = {
             })
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
+            });
+    },
+
+    getFeed(request, response) {
+        const id = request.id;
+
+        connection("feed")
+            .where("usuario_id", id)
+            .then(res => {
+                response.json(res);
+            })
+            .catch(error => {
+                response.sendStatus(404);
             });
     },
 };

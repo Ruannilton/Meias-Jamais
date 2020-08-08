@@ -6,10 +6,13 @@ module.exports = {
         connection("posts")
             .where("id", id)
             .then(res => {
-                response.json(res);
+                const post = res[0];
+                response.json(post);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response
+                    .status(404)
+                    .json({ err: error, msg: error.toString() });
             });
     },
 
@@ -18,6 +21,7 @@ module.exports = {
             usuario_id,
             produto_nome,
             produto_descricao,
+            categoria,
             produto_image,
             produto_link,
             recebido,
@@ -27,13 +31,25 @@ module.exports = {
                 usuario_id,
                 produto_nome,
                 produto_descricao,
+                categoria,
                 produto_image,
                 produto_link,
                 recebido,
             })
             .then(res => {
-                const [id] = res;
-                return response.json({ id });
+                const [post_id] = res;
+                //TODO: catch
+                connection("usuario_usuario")
+                    .where("usuario_seguido_id", usuario_id)
+                    .then(friends => {
+                        friends.forEach(friend => {
+                            connection("feed").insert({
+                                usuario_id: friend.usuario_id,
+                                post_id,
+                            });
+                        });
+                    });
+                response.json({ id });
             })
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
@@ -46,6 +62,7 @@ module.exports = {
             .where("id", id)
             .del()
             .then(res => {
+                connection("feed").where(post_id, id).del();
                 response.json(res);
             })
             .catch(error => {
@@ -82,6 +99,18 @@ module.exports = {
     index(request, response) {
         connection("posts")
             .select("*")
+            .then(res => {
+                response.json(res);
+            })
+            .catch(error => {
+                response.json({ err: error, msg: error.toString() });
+            });
+    },
+
+    indexUser(request, response) {
+        const { id } = request.params;
+        connection("posts")
+            .where("usuario_id", id)
             .then(res => {
                 response.json(res);
             })
