@@ -29,7 +29,7 @@ routes.get("/user/:id", tokenVerifier, userControler.get);
 routes.get("/user/feed", tokenVerifier, userControler.getFeed);
 
 // retorna os seguidores de um usuário
-routes.get("/user/getFollower/:id", tokenVerifier, userControler.getFollowers);
+routes.get("/user/getFollowers/:id", tokenVerifier, userControler.getFollowers);
 
 // retorna os usuários que este usuário segue
 routes.get("/user/getFollowing/:id", tokenVerifier, userControler.getFollowing);
@@ -41,10 +41,18 @@ routes.delete("/user/remove/:id", tokenVerifier, userControler.delete);
 routes.put("/user/update", tokenVerifier, userControler.update);
 
 // para de seguir um usuário
-routes.delete("/user/remFollower/:id", tokenVerifier, userControler.remFolower);
+routes.delete(
+    "/user/remFollower/:other_id",
+    tokenVerifier,
+    userControler.remFolower
+);
 
 //passa a seguir um usuário
-routes.post("/user/addFollower/:id", tokenVerifier, userControler.addFolower);
+routes.post(
+    "/user/addFollower/:other_id",
+    tokenVerifier,
+    userControler.addFolower
+);
 
 routes.post("/user/create", userControler.create);
 /*
@@ -67,8 +75,6 @@ routes.post("/post/create", tokenVerifier, postControler.create);
 routes.delete("/post/remove/:id", tokenVerifier, postControler.remove);
 
 routes.put("/post/update", tokenVerifier, postControler.update);
-
-routes.get("/post/index", tokenVerifier, postControler.index);
 
 routes.get("/post/index/:id", tokenVerifier, postControler.indexUser);
 //#endregion

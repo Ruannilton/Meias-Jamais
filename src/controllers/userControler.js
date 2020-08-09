@@ -174,16 +174,32 @@ module.exports = {
     addFolower(request, response) {
         const { other_id } = request.params;
         const id = request.id;
-
         connection("usuario_usuario")
-            .insert({
+            .where({
                 usuario_id: id,
                 usuario_seguido_id: other_id,
-                pendente: true,
             })
             .then(res => {
-                const [id] = res;
-                return response.json({ id });
+                if (res.length == 0) {
+                    connection("usuario_usuario")
+                        .insert({
+                            usuario_id: id,
+                            usuario_seguido_id: other_id,
+                            pendente: true,
+                        })
+                        .then(res => {
+                            const [id] = res;
+                            return response.json({ id });
+                        })
+                        .catch(error => {
+                            response.json({
+                                err: error,
+                                msg: error.toString(),
+                            });
+                        });
+                } else {
+                    response.status(400).json({ msg: "usuario ja é seguido" });
+                }
             })
             .catch(error => {
                 response.json({ err: error, msg: error.toString() });
@@ -216,7 +232,7 @@ module.exports = {
                 const c = res.length;
 
                 for (const i of res) {
-                    r.push(i["usuario_id"]);
+                    r.push(i.usuario_id);
                 }
                 return response.json({ total: c, values: r });
             })
@@ -230,12 +246,11 @@ module.exports = {
         connection("usuario_usuario")
             .where("usuario_id", id)
             .select("usuario_seguido_id")
-            .as("usuario_id")
             .then(res => {
                 let r = [];
                 const c = res.length;
                 for (const i of res) {
-                    r.push(i["usuario_id"]);
+                    r.push(i.usuario_id);
                 }
                 return response.json({ total: c, values: r });
             })
@@ -246,7 +261,7 @@ module.exports = {
 
     getFeed(request, response) {
         const id = request.id;
-
+        console.log("getting feed", id);
         connection("feed")
             .where("usuario_id", id)
             .then(res => {

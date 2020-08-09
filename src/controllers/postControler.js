@@ -6,8 +6,12 @@ module.exports = {
         connection("posts")
             .where("id", id)
             .then(res => {
-                const post = res[0];
-                response.json(post);
+                if (res.length == 0) {
+                    response.sendStatus(404);
+                } else {
+                    const post = res[0];
+                    response.json(post);
+                }
             })
             .catch(error => {
                 response
@@ -17,8 +21,8 @@ module.exports = {
     },
 
     create(request, response) {
+        const usuario_id = request.id;
         const {
-            usuario_id,
             produto_nome,
             produto_descricao,
             categoria,
@@ -42,17 +46,25 @@ module.exports = {
                 connection("usuario_usuario")
                     .where("usuario_seguido_id", usuario_id)
                     .then(friends => {
-                        friends.forEach(friend => {
-                            connection("feed").insert({
-                                usuario_id: friend.usuario_id,
-                                post_id,
-                            });
-                        });
+                        console.log(friends);
+
+                        for (const friend of friends) {
+                            connection("feed")
+                                .insert({
+                                    usuario_id: friend.usuario_id,
+                                    post_id,
+                                })
+                                .then(res => {
+                                    console.log("added in friend feed");
+                                });
+                        }
                     });
-                response.json({ id });
+                response.json({ post_id });
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response
+                    .status(400)
+                    .json({ err: error, msg: error.toString() });
             });
     },
 
