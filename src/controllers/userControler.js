@@ -248,9 +248,10 @@ module.exports = {
             .select("usuario_seguido_id")
             .then(res => {
                 let r = [];
+                console.log(res);
                 const c = res.length;
                 for (const i of res) {
-                    r.push(i.usuario_id);
+                    r.push(i.usuario_seguido_id);
                 }
                 return response.json({ total: c, values: r });
             })
@@ -265,10 +266,10 @@ module.exports = {
         connection("feed")
             .where("usuario_id", id)
             .then(res => {
-                response.json(res);
+                response.status(200).json(res);
             })
             .catch(error => {
-                response.sendStatus(404);
+                response.status(404).send(error);
             });
     },
 };

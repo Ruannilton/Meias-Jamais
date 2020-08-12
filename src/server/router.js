@@ -26,7 +26,7 @@ routes.get("/user/getCurrentUser", tokenVerifier, userControler.getUser);
 routes.get("/user/:id", tokenVerifier, userControler.get);
 
 // retorna o feed de um usuario
-routes.get("/user/feed", tokenVerifier, userControler.getFeed);
+routes.post("/user/feed", tokenVerifier, userControler.getFeed);
 
 // retorna os seguidores de um usuário
 routes.get("/user/getFollowers/:id", tokenVerifier, userControler.getFollowers);
