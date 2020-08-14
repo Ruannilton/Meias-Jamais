@@ -95,7 +95,6 @@ module.exports = {
         connection("posts")
             .where("id", id)
             .update({
-                usuario_id,
                 produto_nome,
                 produto_descricao,
                 produto_image,
