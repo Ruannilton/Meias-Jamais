@@ -91,6 +91,7 @@ module.exports = {
             produto_link,
             recebido,
         } = request.body;
+        console.log("Post id", id, "\ndata: ", request.body);
         connection("posts")
             .where("id", id)
             .update({
