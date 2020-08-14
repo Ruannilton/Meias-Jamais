@@ -105,7 +105,9 @@ module.exports = {
                 response.json(res);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response
+                    .status(404)
+                    .json({ err: error, msg: error.toString() });
             });
     },
 
