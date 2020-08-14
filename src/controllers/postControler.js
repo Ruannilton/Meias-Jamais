@@ -83,6 +83,7 @@ module.exports = {
     },
 
     update(request, response) {
+        const { id } = request.params;
         const {
             produto_nome,
             produto_descricao,

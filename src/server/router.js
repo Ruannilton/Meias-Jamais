@@ -74,7 +74,7 @@ routes.post("/post/create", tokenVerifier, postControler.create);
 
 routes.delete("/post/remove/:id", tokenVerifier, postControler.remove);
 
-routes.put("/post/update", tokenVerifier, postControler.update);
+routes.put("/post/update/:id", tokenVerifier, postControler.update);
 
 routes.get("/post/index/:id", tokenVerifier, postControler.indexUser);
 //#endregion
