@@ -7,10 +7,10 @@ module.exports = {
         connection("usuario")
             .select("*")
             .then(res => {
-                response.json(res);
+                response.status(200).json(res);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -22,21 +22,16 @@ module.exports = {
             .orWhere({ email: login, senha: password })
             .then(res => {
                 const usr = res[0];
-                if (usr == undefined) {
-                    response.status(404).json({ msg: "user not found" });
-                } else {
-                    console.log(
-                        "[userControler][login]:",
-                        usr.nome_usuario,
-                        usr.senha
-                    );
+                if (usr == undefined) response.sendStatus(404);
+                else {
                     let token = jwt.sign({ id: usr.id }, "teste");
-                    response.json({ token, user: { login, password } });
+                    response
+                        .status(200)
+                        .json({ token, user: { login, password } });
                 }
             })
             .catch(error => {
-                console.log("deu ruim");
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -46,12 +41,12 @@ module.exports = {
         connection("usuario")
             .where("id", id)
             .then(res => {
-                response.json(res);
+                const usr = res[0];
+                if (usr == undefined) response.sendStatus(404);
+                else response.status(200).json(usr);
             })
             .catch(error => {
-                response
-                    .status(404)
-                    .json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -60,15 +55,19 @@ module.exports = {
         connection("usuario")
             .where("id", id)
             .then(res => {
-                response.json(res);
+                const usr = res[0];
+                if (usr == undefined) response.sendStatus(404);
+                else response.status(200).json(usr);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
     update(request, response) {
         const { nome, descricao } = request.body;
+        const id = request.id;
+        console.log("User id: ", id);
         connection("usuario")
             .where("id", id)
             .update({
@@ -76,10 +75,11 @@ module.exports = {
                 descricao,
             })
             .then(res => {
-                response.json(res);
+                if (res === 0) response.sendStatus(404);
+                else response.sendStatus(200);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -99,12 +99,8 @@ module.exports = {
             .where({ nome_usuario })
             .count()
             .then(res => {
-                console.log("nome_usuario: ", res[0]["count(*)"]);
-
                 if (res[0]["count(*)"] > 0) {
-                    response.json({
-                        msg: "username already exist",
-                    });
+                    response.status(409).send("username already exist");
                     return;
                 } else {
                     connection("usuario")
@@ -113,9 +109,7 @@ module.exports = {
                         .then(res => {
                             console.log("email: ", res[0]["count(*)"]);
                             if (res[0]["count(*)"] > 0) {
-                                response.json({
-                                    msg: "email already exist",
-                                });
+                                response.status(409)("email already exist");
                                 return;
                             } else {
                                 connection("usuario")
@@ -134,27 +128,24 @@ module.exports = {
                                     })
                                     .then(res => {
                                         const [id] = res;
-                                        return response.json({ id });
+                                        return response
+                                            .status(200)
+                                            .json({ id });
                                     })
                                     .catch(error => {
-                                        response.status(404).json({
-                                            err: error,
-                                            msg: error.toString(),
-                                        });
+                                        response
+                                            .status(500)
+                                            .send(error.toString());
                                     });
                             }
                         })
                         .catch(error => {
-                            response
-                                .status(404)
-                                .json({ err: error, msg: error.toString() });
+                            response.status(500).send(error.toString());
                         });
                 }
             })
             .catch(error => {
-                response
-                    .status(404)
-                    .json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -164,45 +155,60 @@ module.exports = {
             .where("id", id)
             .del()
             .then(res => {
-                response.json(res);
+                if (res === 0) response.sendStatus(404);
+                else response.sendStatus(200);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
     addFolower(request, response) {
         const { other_id } = request.params;
         const id = request.id;
-        connection("usuario_usuario")
-            .where({
-                usuario_id: id,
-                usuario_seguido_id: other_id,
-            })
-            .then(res => {
-                if (res.length == 0) {
+        connection("usuario")
+            .where("id", other_id)
+            .then(r => {
+                if (r.length === 0) {
+                    response.status(404).send("usuario fornecido não existe");
+                } else {
                     connection("usuario_usuario")
-                        .insert({
+                        .where({
                             usuario_id: id,
                             usuario_seguido_id: other_id,
-                            pendente: true,
                         })
                         .then(res => {
-                            const [id] = res;
-                            return response.json({ id });
+                            if (res.length == 0) {
+                                connection("usuario_usuario")
+                                    .insert({
+                                        usuario_id: id,
+                                        usuario_seguido_id: other_id,
+                                        pendente: true,
+                                    })
+                                    .then(res => {
+                                        const [id] = res;
+                                        return response
+                                            .status(200)
+                                            .json({ id });
+                                    })
+                                    .catch(error => {
+                                        response
+                                            .status(500)
+                                            .send(error.toString());
+                                    });
+                            } else {
+                                response
+                                    .status(400)
+                                    .send("usuario ja é seguido");
+                            }
                         })
                         .catch(error => {
-                            response.json({
-                                err: error,
-                                msg: error.toString(),
-                            });
+                            response.status(500).send(error.toString());
                         });
-                } else {
-                    response.status(400).json({ msg: "usuario ja é seguido" });
                 }
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -211,14 +217,14 @@ module.exports = {
         const id = request.id;
 
         connection("usuario_usuario")
-            .where("usuario_id", id)
-            .where("usuario_seguido_id", other_id)
+            .where({ usuario_id: id, usuario_seguido_id: other_id })
             .del()
             .then(res => {
-                return response.json(res);
+                if (res === 0) return response.sendStatus(404);
+                else return response.sendStatus(200);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -230,33 +236,44 @@ module.exports = {
             .then(res => {
                 let r = [];
                 const c = res.length;
-
                 for (const i of res) {
                     r.push(i.usuario_id);
                 }
-                return response.json({ total: c, values: r });
+                return response.status(200).json({ total: c, values: r });
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
     getFollowing(request, response) {
         const { id } = request.params;
-        connection("usuario_usuario")
-            .where("usuario_id", id)
-            .select("usuario_seguido_id")
-            .then(res => {
-                let r = [];
-                console.log(res);
-                const c = res.length;
-                for (const i of res) {
-                    r.push(i.usuario_seguido_id);
+
+        connection("usuario")
+            .where("id", id)
+            .then(r => {
+                if (r.length === 0) {
+                    response.status(404).send("usuario fornecido não existe");
+                } else {
+                    connection("usuario_usuario")
+                        .where("usuario_id", id)
+                        .select("usuario_seguido_id")
+                        .then(res => {
+                            let r = [];
+                            console.log(res);
+                            const c = res.length;
+                            for (const i of res) {
+                                r.push(i.usuario_seguido_id);
+                            }
+                            return response.json({ total: c, values: r });
+                        })
+                        .catch(error => {
+                            response.status(500).send(error.toString());
+                        });
                 }
-                return response.json({ total: c, values: r });
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -269,7 +286,7 @@ module.exports = {
                 response.status(200).json(res);
             })
             .catch(error => {
-                response.status(404).send(error);
+                response.status(500).send(error.toString());
             });
     },
 };

@@ -14,9 +14,7 @@ module.exports = {
                 }
             })
             .catch(error => {
-                response
-                    .status(404)
-                    .json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -62,9 +60,7 @@ module.exports = {
                 response.json({ post_id });
             })
             .catch(error => {
-                response
-                    .status(400)
-                    .json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -74,11 +70,15 @@ module.exports = {
             .where("id", id)
             .del()
             .then(res => {
-                connection("feed").where(post_id, id).del();
-                response.json(res);
+                if (res !== 0) {
+                    connection("feed").where(post_id, id).del();
+                    response.status(200).json(res);
+                } else {
+                    response.sendStatus(404);
+                }
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -91,7 +91,7 @@ module.exports = {
             produto_link,
             recebido,
         } = request.body;
-        console.log("Post id", id, "\ndata: ", request.body);
+
         connection("posts")
             .where("id", id)
             .update({
@@ -102,12 +102,11 @@ module.exports = {
                 recebido,
             })
             .then(res => {
-                response.json(res);
+                if (res === 0) response.sendStatus(404);
+                else response.json(res);
             })
             .catch(error => {
-                response
-                    .status(404)
-                    .json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -118,7 +117,7 @@ module.exports = {
                 response.json(res);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 
@@ -130,7 +129,7 @@ module.exports = {
                 response.json(res);
             })
             .catch(error => {
-                response.json({ err: error, msg: error.toString() });
+                response.status(500).send(error.toString());
             });
     },
 };
