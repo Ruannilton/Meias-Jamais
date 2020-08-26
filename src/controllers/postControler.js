@@ -71,8 +71,8 @@ module.exports = {
             .del()
             .then(res => {
                 if (res !== 0) {
-                    connection("feed").where(post_id, id).del();
-                    response.status(200).json(res);
+                    connection("feed").where("post_id", id).del();
+                    response.sendStatus(200);
                 } else {
                     response.sendStatus(404);
                 }
