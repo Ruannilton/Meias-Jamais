@@ -43,7 +43,10 @@ module.exports = {
             .then(res => {
                 const usr = res[0];
                 if (usr == undefined) response.sendStatus(404);
-                else response.status(200).json(usr);
+                else {
+                    delete usr["senha"];
+                    response.status(200).json(usr);
+                }
             })
             .catch(error => {
                 response.status(500).send(error.toString());
