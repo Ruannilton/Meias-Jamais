@@ -1,4 +1,4 @@
-const connection = require("./../database/connetcion");
+const connection = require("../database/connetcion");
 const jwt = require("jsonwebtoken");
 const { request } = require("express");
 

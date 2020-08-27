@@ -1,12 +1,12 @@
 const express = require("express");
 const routes = express.Router();
 const tokenVerifier = require("./tokenVerifier");
-const userControler = require("./../controllers/userControler");
-const postControler = require("./../controllers/postControler");
-const curtidasControler = require("./../controllers/curtidasControler");
-const comentatiosControler = require("./../controllers/comentariosControler");
-const interesseControler = require("./../controllers/interessesControler");
-const uploadImage = require("./../controllers/uploadImagenControler");
+const userControler = require("./../api/userAPI");
+const postControler = require("./../api/postAPI");
+const curtidasControler = require("./../api/curtidasAPI");
+const comentatiosControler = require("./../api/comentariosAPI");
+const interesseControler = require("./../api/interessesAPI");
+const uploadImage = require("./../api/uploadImagenAPI");
 
 //#region USER
 
