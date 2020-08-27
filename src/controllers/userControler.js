@@ -112,7 +112,9 @@ module.exports = {
                         .then(res => {
                             console.log("email: ", res[0]["count(*)"]);
                             if (res[0]["count(*)"] > 0) {
-                                response.status(409)("email already exist");
+                                response
+                                    .status(409)
+                                    .send("email already exist");
                                 return;
                             } else {
                                 connection("usuario")
