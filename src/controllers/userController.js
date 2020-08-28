@@ -1,6 +1,6 @@
 const connection = require("../database/connetcion");
 
-class userController {
+export default class userController {
     getAll() {
         return connection("usuario")
             .select("*")
@@ -15,7 +15,7 @@ class userController {
         return connection("usuario")
             .where("nome_usuario", name)
             .then(res => {
-                if (res.length === 0) return null;
+                if (res.length === 0) return false;
                 for (let index = 0; index < res.length; index++) {
                     delete res[index]["senha"];
                 }
@@ -30,7 +30,7 @@ class userController {
             .where("email", email)
             .then(res => {
                 const usr = res[0];
-                if (usr == undefined) return null;
+                if (usr == undefined) return false;
                 else {
                     delete usr["senha"];
                     return usr;
@@ -45,7 +45,7 @@ class userController {
             .where("id", id)
             .then(res => {
                 const usr = res[0];
-                if (usr == undefined) return null;
+                if (usr == undefined) return false;
                 else {
                     delete usr["senha"];
                     return usr;
@@ -70,7 +70,7 @@ class userController {
     createUser(data = {}) {
         if (
             this.getUserByEmail(data.email) === null &&
-            this.getUserByUserName(data.user_name) === null
+            this.getUserByUserName(data.nome_usuario) === null
         ) {
             return connection("usuario")
                 .insert(data)
@@ -82,7 +82,7 @@ class userController {
                     throw error;
                 });
         } else {
-            return null;
+            return false;
         }
     }
     deleteUser(id = 0) {
@@ -97,7 +97,7 @@ class userController {
                 throw error;
             });
     }
-    addFollower(id, other_id) {}
+
     removeFollower(id, other_id) {
         return connection("usuario_usuario")
             .where({ usuario_id: id, usuario_seguido_id: other_id })
@@ -110,7 +110,7 @@ class userController {
                 throw error;
             });
     }
-    getFollers(id) {
+    getFollowers(id) {
         return connection("usuario_usuario")
             .where("usuario_seguido_id", id)
             .select("usuario_id")
@@ -126,7 +126,6 @@ class userController {
                 throw error;
             });
     }
-    getFollowing(id) {}
     getFeed(id) {
         return connection("feed")
             .where("usuario_id", id)
@@ -137,4 +136,6 @@ class userController {
                 throw error;
             });
     }
+    addFollower(id, other_id) {}
+    getFollowing(id) {}
 }
