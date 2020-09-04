@@ -11,12 +11,12 @@ const storage = multer.diskStorage({
             cb(
                 null,
                 file.fieldname +
-                    "-" +
-                    datetimestamp +
-                    "." +
-                    file.originalname.split(".")[
-                        file.originalname.split(".").length - 1
-                    ]
+                "-" +
+                datetimestamp +
+                "." +
+                file.originalname.split(".")[
+                file.originalname.split(".").length - 1
+                ]
             );
         } catch (err) {
             cb(err);
@@ -30,12 +30,13 @@ const upload = multer({
         if (
             ["png", "jpg", "jpeg"].indexOf(
                 file.originalname.split(".")[
-                    file.originalname.split(".").length - 1
+                file.originalname.split(".").length - 1
                 ]
             ) === -1
         ) {
             return callback(new Error("Wrong extension type"));
         }
+
 
         callback(null, true);
     },

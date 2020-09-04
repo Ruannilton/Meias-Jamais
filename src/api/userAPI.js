@@ -17,9 +17,13 @@ module.exports = {
         const id = request.id;
         try {
             const usr = await userController.getUserByID(id);
+            const following = (await userController.getFollowing(id)).total;
+            const followers = (await userController.getFollowers(id)).total;
             if (usr === false) {
                 response.sendStatus(404);
             } else {
+                usr["following"] = following
+                usr["followers"] = followers
                 response.status(200).json(usr);
             }
         } catch (error) {

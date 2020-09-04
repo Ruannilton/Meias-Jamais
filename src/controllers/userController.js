@@ -1,12 +1,16 @@
 const connection = require("../database/connetcion");
 const jwt = require("jsonwebtoken");
 
+
 module.exports = {
     async getAll() {
 
         return connection("usuario")
             .select("*")
             .then(res => {
+                for (let index = 0; index < res.length; index++) {
+                    delete res[index]["senha"];
+                }
                 return res;
             })
             .catch(error => {

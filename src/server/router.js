@@ -168,7 +168,7 @@ routes.post("/upload/image", uploadImage.single("file"), function (
     res,
     next
 ) {
-    res.sendStatus(200).json();
+    res.status(200).json(req.file.path);
 });
 
 //#endregion
