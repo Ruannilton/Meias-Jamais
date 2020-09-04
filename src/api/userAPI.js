@@ -163,79 +163,36 @@ module.exports = {
     async addFolower(request, response) {
         const { other_id } = request.params;
         const id = request.id;
-        connection("usuario")
-            .where("id", other_id)
-            .then(r => {
-                if (r.length === 0) {
-                    response.status(404).send("usuario fornecido não existe");
-                } else {
-                    connection("usuario_usuario")
-                        .where({
-                            usuario_id: id,
-                            usuario_seguido_id: other_id,
-                        })
-                        .then(res => {
-                            if (res.length == 0) {
-                                connection("usuario_usuario")
-                                    .insert({
-                                        usuario_id: id,
-                                        usuario_seguido_id: other_id,
-                                        pendente: true,
-                                    })
-                                    .then(res => {
-                                        const [id] = res;
-                                        return response
-                                            .status(200)
-                                            .json({ id });
-                                    })
-                                    .catch(error => {
-                                        response
-                                            .status(500)
-                                            .send(error.toString());
-                                    });
-                            } else {
-                                response
-                                    .status(400)
-                                    .send("usuario ja é seguido");
-                            }
-                        })
-                        .catch(error => {
-                            response.status(500).send(error.toString());
-                        });
-                }
-            })
-            .catch(error => {
-                response.status(500).send(error.toString());
-            });
+
+        try {
+            const res = await userController.addFollower(id, other_id);
+            if (res === null) {
+                response.status(404).send("usuario fornecido não existe");
+            } else if (res === false) {
+                response.status(400).send("usuario ja é seguido");
+            } else {
+                response.status(200).json(res);
+            }
+
+        } catch (error) {
+            response.status(500).send(error.toString());
+        }
+
     },
     async getFollowing(request, response) {
         const { id } = request.params;
 
-        connection("usuario")
-            .where("id", id)
-            .then(r => {
-                if (r.length === 0) {
-                    response.status(404).send("usuario fornecido não existe");
-                } else {
-                    connection("usuario_usuario")
-                        .where("usuario_id", id)
-                        .select("usuario_seguido_id")
-                        .then(res => {
-                            let r = [];
-                            console.log(res);
-                            const c = res.length;
-                            for (const i of res) {
-                                r.push(i.usuario_seguido_id);
-                            }
-                            return response.json({ total: c, values: r });
-                        })
-                        .catch(error => {
-                            response.status(500).send(error.toString());
-                        });
-                }
-            })
-            .catch(error => {
-                response.status(500).send(error.toString());
-            });
+        try {
+            const r = await userController.getFollowing(id);
+
+            if (r === null) {
+                response.status(404).send("usuario fornecido não existe");
+            } else {
+                response.status(200).json(r);
+            }
+        } catch (error) {
+            response.status(500).send(error.toString());
+        }
+
     },
 };
