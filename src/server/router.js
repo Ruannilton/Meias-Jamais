@@ -1,7 +1,7 @@
 const express = require("express");
 const routes = express.Router();
 const tokenVerifier = require("./tokenVerifier");
-const userControler = require("./../api/userAPI");
+const userAPI = require("./../api/userAPI");
 const postControler = require("./../api/postAPI");
 const curtidasControler = require("./../api/curtidasAPI");
 const comentatiosControler = require("./../api/comentariosAPI");
@@ -14,47 +14,47 @@ const uploadImage = require("./../api/uploadImagenAPI");
 // DETESTEO ISSO AQUI NA MORAL
 
 //login
-routes.post("/user/login", userControler.login);
+routes.post("/user/login", userAPI.login);
 
 // retorna todos os usuarios
-routes.get("/user/index", tokenVerifier, userControler.index);
+routes.get("/user/index", tokenVerifier, userAPI.index);
 
 // retonar o usuario logado
-routes.get("/user/getCurrentUser", tokenVerifier, userControler.getUser);
+routes.get("/user/getCurrentUser", tokenVerifier, userAPI.getUser);
 
 // retorna um usuário específico
-routes.get("/user/:id", tokenVerifier, userControler.get);
+routes.get("/user/:id", tokenVerifier, userAPI.get);
 
 // retorna o feed de um usuario
-routes.post("/user/feed", tokenVerifier, userControler.getFeed);
+routes.post("/user/feed", tokenVerifier, userAPI.getFeed);
 
 // retorna os seguidores de um usuário
-routes.get("/user/getFollowers/:id", tokenVerifier, userControler.getFollowers);
+routes.get("/user/getFollowers/:id", tokenVerifier, userAPI.getFollowers);
 
 // retorna os usuários que este usuário segue
-routes.get("/user/getFollowing/:id", tokenVerifier, userControler.getFollowing);
+routes.get("/user/getFollowing/:id", tokenVerifier, userAPI.getFollowing);
 
 // delete um usuário
-routes.delete("/user/remove/:id", tokenVerifier, userControler.delete);
+routes.delete("/user/remove/:id", tokenVerifier, userAPI.delete);
 
 //atualiza os dados de um usuario
-routes.put("/user/update", tokenVerifier, userControler.update);
+routes.put("/user/update", tokenVerifier, userAPI.update);
 
 // para de seguir um usuário
 routes.delete(
     "/user/remFollower/:other_id",
     tokenVerifier,
-    userControler.remFolower
+    userAPI.remFolower
 );
 
 //passa a seguir um usuário
 routes.post(
     "/user/addFollower/:other_id",
     tokenVerifier,
-    userControler.addFolower
+    userAPI.addFolower
 );
 
-routes.post("/user/create", userControler.create);
+routes.post("/user/create", userAPI.create);
 /*
 cria um novo usuário
 {

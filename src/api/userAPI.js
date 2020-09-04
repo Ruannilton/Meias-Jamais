@@ -1,23 +1,22 @@
 const connection = require("../database/connetcion");
 const jwt = require("jsonwebtoken");
 const { request } = require("express");
-import userController from "../controllers/userController";
-const user = new userController();
+const userController = require("../controllers/userController");
 
 module.exports = {
-    index(request, response) {
+    async index(request, response) {
         try {
-            const data = user.getAll();
+            const data = await userController.getAll();
             response.status(200).json(data);
         } catch (error) {
             response.status(500).send(error.toString());
         }
     },
 
-    getUser(request, response) {
+    async getUser(request, response) {
         const id = request.id;
         try {
-            const usr = user.getUserByID(id);
+            const usr = await userController.getUserByID(id);
             if (usr === false) {
                 response.sendStatus(404);
             } else {
@@ -28,10 +27,10 @@ module.exports = {
         }
     },
 
-    get(request, response) {
+    async get(request, response) {
         const { id } = request.params;
         try {
-            const usr = user.getUserByID(id);
+            const usr = await userController.getUserByID(id);
             if (usr === false) {
                 response.sendStatus(404);
             } else {
@@ -42,12 +41,12 @@ module.exports = {
         }
     },
 
-    update(request, response) {
+    async update(request, response) {
         const data = request.body;
         const id = request.id;
 
         try {
-            const usr = user.updateUser(id, data);
+            const usr = await userController.updateUser(id, data);
             if (usr === false) {
                 response.sendStatus(404);
             } else {
@@ -58,7 +57,7 @@ module.exports = {
         }
     },
 
-    create(request, response) {
+    async create(request, response) {
         const {
             nome,
             email,
@@ -83,7 +82,7 @@ module.exports = {
         };
 
         try {
-            const usr = user.createUser(data);
+            const usr = await userController.createUser(data);
             if (usr === false) {
                 response.status(500).send("User already exist");
             } else {
@@ -94,10 +93,10 @@ module.exports = {
         }
     },
 
-    delete(request, response) {
+    async delete(request, response) {
         const { id } = request.params;
         try {
-            const usr = user.deleteUser(id);
+            const usr = await userController.deleteUser(id);
             if (usr) {
                 response.sendStatus(200);
             } else {
@@ -108,12 +107,12 @@ module.exports = {
         }
     },
 
-    remFolower(request, response) {
+    async remFolower(request, response) {
         const { other_id } = request.params;
         const id = request.id;
 
         try {
-            const usr = user.removeFollower(id, other_id);
+            const usr = await userController.removeFollower(id, other_id);
             if (usr) {
                 response.sendStatus(200);
             } else {
@@ -124,48 +123,44 @@ module.exports = {
         }
     },
 
-    getFollowers(request, response) {
+    async getFollowers(request, response) {
         const { id } = request.params;
         try {
-            const usr = user.getFollowers(id);
+            const usr = await userController.getFollowers(id);
             response.status(200).json(usr);
         } catch (error) {
             response.status(500).send(error.toString());
         }
     },
 
-    getFeed(request, response) {
+    async getFeed(request, response) {
         const id = request.id;
+        console.log("GetFeed", id)
         try {
-            const usr = user.getFeed(id);
+            const usr = await userController.getFeed(id);
             response.status(200).json(usr);
         } catch (error) {
             response.status(500).send(error.toString());
         }
     },
 
-    login(request, response) {
+    async login(request, response) {
         const { password, login } = request.body;
-        console.log("Try logging: ", login, password);
-        connection("usuario")
-            .where({ nome_usuario: login, senha: password })
-            .orWhere({ email: login, senha: password })
-            .then(res => {
-                const usr = res[0];
-                if (usr == undefined) response.sendStatus(404);
-                else {
-                    let token = jwt.sign({ id: usr.id }, "teste");
-                    response
-                        .status(200)
-                        .json({ token, user: { login, password } });
-                }
-            })
-            .catch(error => {
-                response.status(500).send(error.toString());
-            });
+
+        try {
+            const r = await userController.loginUser(login, password);
+            if (r == null) {
+                response.sendStatus(404);
+            } else {
+                response.status(200).json(r);
+            }
+        } catch (error) {
+            response.status(500).send(error.toString());
+        }
+
     },
 
-    addFolower(request, response) {
+    async addFolower(request, response) {
         const { other_id } = request.params;
         const id = request.id;
         connection("usuario")
@@ -213,7 +208,7 @@ module.exports = {
                 response.status(500).send(error.toString());
             });
     },
-    getFollowing(request, response) {
+    async getFollowing(request, response) {
         const { id } = request.params;
 
         connection("usuario")

@@ -1,7 +1,9 @@
 const connection = require("../database/connetcion");
+const jwt = require("jsonwebtoken");
 
-export default class userController {
+module.exports = {
     getAll() {
+
         return connection("usuario")
             .select("*")
             .then(res => {
@@ -10,7 +12,7 @@ export default class userController {
             .catch(error => {
                 throw error;
             });
-    }
+    },
     getUserByUserName(name) {
         return connection("usuario")
             .where("nome_usuario", name)
@@ -24,7 +26,7 @@ export default class userController {
             .catch(error => {
                 throw error;
             });
-    }
+    },
     getUserByEmail(email) {
         return connection("usuario")
             .where("email", email)
@@ -39,7 +41,7 @@ export default class userController {
             .catch(error => {
                 throw error;
             });
-    }
+    },
     getUserByID(id) {
         return connection("usuario")
             .where("id", id)
@@ -54,7 +56,7 @@ export default class userController {
             .catch(error => {
                 throw error;
             });
-    }
+    },
     updateUser(id = 0, data = {}) {
         return connection("usuario")
             .where("id", id)
@@ -66,7 +68,7 @@ export default class userController {
             .catch(error => {
                 throw error;
             });
-    }
+    },
     createUser(data = {}) {
         if (
             this.getUserByEmail(data.email) === null &&
@@ -84,7 +86,7 @@ export default class userController {
         } else {
             return false;
         }
-    }
+    },
     deleteUser(id = 0) {
         return connection("usuario")
             .where("id", id)
@@ -96,7 +98,7 @@ export default class userController {
             .catch(error => {
                 throw error;
             });
-    }
+    },
 
     removeFollower(id, other_id) {
         return connection("usuario_usuario")
@@ -109,7 +111,7 @@ export default class userController {
             .catch(error => {
                 throw error;
             });
-    }
+    },
     getFollowers(id) {
         return connection("usuario_usuario")
             .where("usuario_seguido_id", id)
@@ -125,17 +127,39 @@ export default class userController {
             .catch(error => {
                 throw error;
             });
-    }
+    },
     getFeed(id) {
+        console.log("Feed")
         return connection("feed")
             .where("usuario_id", id)
             .then(res => {
+                console.log("Feed: ", res)
                 return res;
             })
             .catch(error => {
                 throw error;
             });
+    },
+    addFollower(id, other_id) { },
+    getFollowing(id) { },
+    loginUser(login, password) {
+        console.log("Try logging: ", login, password);
+        return connection("usuario")
+            .where({ nome_usuario: login, senha: password })
+            .orWhere({ email: login, senha: password })
+            .then(res => {
+                const usr = res[0];
+
+                if (usr == undefined) {
+                    return null;
+                } else {
+                    const token = jwt.sign({ id: usr.id }, "teste");
+                    const res = { token, user: { login, password } };
+                    return res;
+                }
+            })
+            .catch(error => {
+                throw error;
+            });
     }
-    addFollower(id, other_id) {}
-    getFollowing(id) {}
 }
