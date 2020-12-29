@@ -121,6 +121,7 @@ module.exports = {
             .where("usuario_seguido_id", id)
             .select("usuario_id")
             .then(res => {
+                console.log("[userController][getFollowers]:: ", res)
                 let r = [];
                 const c = res.length;
                 for (const i of res) {

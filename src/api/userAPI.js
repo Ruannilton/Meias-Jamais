@@ -1,6 +1,3 @@
-const connection = require("../database/connetcion");
-const jwt = require("jsonwebtoken");
-const { request } = require("express");
 const userController = require("../controllers/userController");
 
 module.exports = {
